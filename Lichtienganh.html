@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế Hoạch Nội Dung Lớp Học</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fe; margin: 0; padding: 40px 20px; color: #333; }
+        .app-container { max-width: 1200px; margin: auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); overflow: hidden; }
+        .header { background: linear-gradient(135deg, #7c4dff, #a044ff); padding: 30px; color: white; position: relative; }
+        .header h1 { margin: 0 0 5px 0; font-size: 26px; display: flex; align-items: center; gap: 10px; }
+        .header p { margin: 0; opacity: 0.9; font-size: 15px; }
+        
+        .header-buttons { position: absolute; right: 30px; top: 30px; display: flex; gap: 10px; }
+        .btn { padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 14px; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
+        .btn-white { background: white; color: #7c4dff; }
+        .btn-white:hover { background: #f0f0f0; }
+        .btn-purple { background: rgba(255,255,255,0.2); color: white; }
+        .btn-purple:hover { background: rgba(255,255,255,0.3); }
+        
+        .week-navigation { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 6px 15px; border-radius: 20px; margin-bottom: 15px; width: fit-content; }
+        .btn-nav { background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 14px; padding: 5px 10px; border-radius: 50px; transition: 0.2s; }
+        .btn-nav:hover { background: rgba(255,255,255,0.2); }
+        #weekTitle { margin: 0 15px; font-weight: bold; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .progress-section { margin-top: 25px; display: flex; align-items: center; gap: 15px; }
+        .progress-bar-bg { flex: 1; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: #00e676; width: 0%; transition: width 0.4s ease; }
+        .progress-text { font-size: 14px; font-weight: bold; min-width: 120px; text-align: right; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 18px 20px; font-size: 13px; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
+        td { padding: 20px; border-bottom: 1px solid #eee; vertical-align: top; }
+        tr:hover { background-color: #fafbff; }
+        
+        /* CSS CHO KÉO THẢ */
+        .draggable-row { cursor: grab; background: #fff; transition: background 0.2s;}
+        .draggable-row:active { cursor: grabbing; }
+        .draggable-row.dragging { opacity: 0.5; background: #f0f4ff; }
+        .draggable-row.over { border-top: 3px dashed #7c4dff; }
+        .drag-handle { color: #ccc; font-size: 20px; cursor: inherit; margin-right: 15px; display: flex; align-items: center; }
+        .drag-handle:hover { color: #7c4dff; }
+        .date-wrapper { display: flex; align-items: flex-start; }
+
+        .col-date { width: 15%; }
+        .col-date input { font-family: inherit; width: 100%; border: none; outline: none; background: transparent; }
+        .date-day { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 3px; }
+        .date-num { color: #888; font-size: 13px; }
+        
+        .col-type { width: 15%; }
+        .badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: bold; text-align: center; margin-top: 5px;}
+        .badge-chuachon { background: #f0f0f0; color: #888; border: 1px solid #ddd; }
+        .badge-tuyensinh { background: #e3f2fd; color: #1976d2; border: 1px solid #bbdefb; }
+        .badge-video { background: #f3e5f5; color: #7b1fa2; border: 1px solid #e1bee7; }
+        .badge-hoatdong { background: #fff8e1; color: #f57f17; border: 1px solid #ffecb3; }
+        .badge-kienthuc { background: #e8f5e9; color: #388e3c; border: 1px solid #c8e6c9; }
+        .badge-tuongtac { background: #fce4ec; color: #c2185b; border: 1px solid #f8bbd0; }
+
+        .type-select { padding: 5px; border-radius: 5px; border: 1px solid #ddd; outline: none; font-size: 12px; font-family: inherit; color: #555; cursor: pointer; }
+
+        .col-content { width: 40%; }
+        .col-content input { width: 100%; border: none; font-size: 15px; color: #333; outline: none; background: transparent; font-family: inherit; margin-bottom: 5px; }
+        .col-content input:focus { border-bottom: 1px dashed #7c4dff; }
+
+        .col-status { width: 15%; }
+        .status-select { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-weight: bold; font-family: inherit; appearance: none; cursor: pointer; }
+        .status-dadang { background: #e8f5e9; color: #2e7d32; border-color: #c8e6c9; }
+        .status-danglam { background: #fff8e1; color: #ef6c00; border-color: #ffecb3; }
+        .status-chuadang { background: #f5f5f5; color: #666; border-color: #e0e0e0; }
+
+        .col-action { width: 15%; text-align: right; }
+        .btn-action { padding: 8px 12px; background: #f4f7fe; color: #555; border: 1px solid #e0e5f2; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .btn-action:hover { background: #e0e5f2; }
+        .btn-delete { background: #ffebee; color: #c62828; border-color: #ffcdd2; margin-left: 5px; padding: 8px 10px; }
+        .btn-delete:hover { background: #ffcdd2; }
+
+        .footer-hint { padding: 15px 30px; font-size: 13px; color: #666; background: #fafafa; border-top: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div class="header">
+        <div class="header-buttons">
+            <button class="btn btn-white" onclick="exportToExcel()">📄 Xuất File Excel</button>
+            <button class="btn btn-purple" onclick="addRow()">+ Thêm bài</button>
+        </div>
+        
+        <div class="week-navigation">
+            <button class="btn-nav" onclick="changeWeek(-1)">◀ Tuần trước</button>
+            <span id="weekTitle">Đang tải tuần...</span>
+            <button class="btn-nav" onclick="changeWeek(1)">Tuần sau ▶</button>
+        </div>
+
+        <h1>📅 Kế Hoạch Nội Dung Lớp Học</h1>
+        <p>Quản lý nội dung fanpage dễ dàng. Có thể KÉO THẢ các hàng để sắp xếp vị trí.</p>
+        
+        <div class="progress-section">
+            <span class="progress-text" style="text-align: left; min-width: auto;">Tiến độ tuần này:</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+            <span class="progress-text" id="progressText">0/0 Hoàn thành</span>
+        </div>
+    </div>
+
+    <table id="contentTable">
+        <thead>
+            <tr>
+                <th>Thứ / Ngày</th>
+                <th>Phân loại</th>
+                <th>Mục tiêu & Nội dung chi tiết</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    
+    <div class="footer-hint">
+        <span>💡</span>
+        <span><b>Mẹo:</b> Mỗi tuần có 7 ngày. Giữ và kéo thả biểu tượng ☰ để thay đổi thứ tự các bài đăng trong tuần.</span>
+    </div>
+</div>
+
+<script>
+    let allData = [];
+    let currentMonday = new Date();
+    let draggedRowId = null; // Lưu ID của hàng đang được kéo
+
+    function formatDateStr(dateObj) {
+        let d = dateObj.getDate().toString().padStart(2, '0');
+        let m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+        let y = dateObj.getFullYear();
+        return `${d}/${m}/${y}`;
+    }
+
+    function getWeekKey(mondayObj) {
+        return formatDateStr(mondayObj);
+    }
+
+    function init() {
+        let today = new Date();
+        let day = today.getDay();
+        let diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        currentMonday = new Date(today.setDate(diff));
+        currentMonday.setHours(0,0,0,0);
+
+        const saved = localStorage.getItem("LichLopHoc_Pro_TheoTuan");
+        if (saved) {
+            allData = JSON.parse(saved);
+        }
+        
+        renderTable();
+    }
+
+    function changeWeek(offset) {
+        currentMonday.setDate(currentMonday.getDate() + (offset * 7));
+        renderTable();
+    }
+
+    function renderTable() {
+        let sunday = new Date(currentMonday);
+        sunday.setDate(currentMonday.getDate() + 6);
+        document.getElementById('weekTitle').innerText = `Tuần: Từ ${formatDateStr(currentMonday)} đến ${formatDateStr(sunday)}`;
+
+        let weekKey = getWeekKey(currentMonday);
+        let weekData = allData.filter(item => item.weekKey === weekKey);
+
+        if (weekData.length === 0) {
+            let dayNames = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
+            for (let i = 0; i < 7; i++) {
+                let tempDate = new Date(currentMonday);
+                tempDate.setDate(currentMonday.getDate() + i);
+                
+                let newItem = {
+                    id: Date.now() + i,
+                    weekKey: weekKey,
+                    day: dayNames[i],
+                    date: formatDateStr(tempDate),
+                    type: "chuachon",
+                    typeText: "Chưa chọn",
+                    content: "",
+                    subText: "",
+                    status: "chuadang"
+                };
+                allData.push(newItem);
+            }
+            saveData(false);
+            weekData = allData.filter(item => item.weekKey === weekKey);
+        }
+
+        const tbody = document.querySelector("#contentTable tbody");
+        tbody.innerHTML = "";
+
+        weekData.forEach((row) => {
+            const tr = document.createElement("tr");
+            tr.className = "draggable-row"; // Thêm class kéo thả
+            tr.setAttribute("draggable", "true"); // Kích hoạt kéo thả
+            tr.dataset.id = row.id; // Gắn ID để nhận diện khi đổi chỗ
+
+            // Các Event Listener cho tính năng Drag & Drop
+            tr.addEventListener('dragstart', handleDragStart);
+            tr.addEventListener('dragover', handleDragOver);
+            tr.addEventListener('dragenter', handleDragEnter);
+            tr.addEventListener('dragleave', handleDragLeave);
+            tr.addEventListener('drop', handleDrop);
+            tr.addEventListener('dragend', handleDragEnd);
+
+            let selectClass = "status-chuadang";
+            if(row.status === "dadang") selectClass = "status-dadang";
+            if(row.status === "danglam") selectClass = "status-danglam";
+
+            tr.innerHTML = `
+                <td class="col-date">
+                    <div class="date-wrapper">
+                        <span class="drag-handle" title="Kéo để di chuyển">☰</span>
+                        <div>
+                            <input type="text" class="date-day" value="${row.day}" oninput="updateRow(${row.id}, 'day', this.value)">
+                            <input type="text" class="date-num" value="${row.date}" oninput="updateRow(${row.id}, 'date', this.value)">
+                        </div>
+                    </div>
+                </td>
+                <td class="col-type">
+                    <select class="type-select" onchange="updateType(${row.id}, this.value)">
+                        <option value="chuachon" ${row.type === 'chuachon' ? 'selected' : ''}>-- Chọn --</option>
+                        <option value="tuyensinh" ${row.type === 'tuyensinh' ? 'selected' : ''}>Tuyển Sinh</option>
+                        <option value="video" ${row.type === 'video' ? 'selected' : ''}>Video</option>
+                        <option value="hoatdong" ${row.type === 'hoatdong' ? 'selected' : ''}>Hoạt Động</option>
+                        <option value="kienthuc" ${row.type === 'kienthuc' ? 'selected' : ''}>Kiến Thức</option>
+                        <option value="tuongtac" ${row.type === 'tuongtac' ? 'selected' : ''}>Tương Tác</option>
+                    </select>
+                    <div><span class="badge badge-${row.type}">${row.typeText}</span></div>
+                </td>
+                <td class="col-content">
+                    <input type="text" value="${row.content}" oninput="updateRow(${row.id}, 'content', this.value)" placeholder="Ghi nội dung bài đăng vào đây...">
+                </td>
+                <td class="col-status">
+                    <select class="status-select ${selectClass}" onchange="updateStatus(${row.id}, this)">
+                        <option value="chuadang" ${row.status === 'chuadang' ? 'selected' : ''}>Chưa đăng</option>
+                        <option value="danglam" ${row.status === 'danglam' ? 'selected' : ''}>Đang làm ⏳</option>
+                        <option value="dadang" ${row.status === 'dadang' ? 'selected' : ''}>Đã đăng ✔️</option>
+                    </select>
+                </td>
+                <td class="col-action">
+                    <button class="btn-action">📝 Sửa</button>
+                    <button class="btn-action btn-delete" onclick="deleteRow(${row.id})" title="Xóa">❌</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+        updateProgress(weekData);
+    }
+
+    /* ==== CÁC HÀM XỬ LÝ KÉO THẢ ==== */
+    function handleDragStart(e) {
+        draggedRowId = parseInt(this.dataset.id);
+        this.classList.add('dragging');
+        e.dataTransfer.effectAllowed = 'move';
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault(); // Cần thiết để cho phép Drop
+        }
+        e.dataTransfer.dropEffect = 'move';
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('over');
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation();
+        }
+        
+        let targetRowId = parseInt(this.dataset.id);
+        
+        if (draggedRowId !== targetRowId) {
+            let weekKey = getWeekKey(currentMonday);
+            // Lấy riêng mảng dữ liệu của tuần hiện tại để đổi chỗ
+            let weekData = allData.filter(item => item.weekKey === weekKey);
+            
+            let draggedIndex = weekData.findIndex(x => x.id === draggedRowId);
+            let targetIndex = weekData.findIndex(x => x.id === targetRowId);
+            
+            if(draggedIndex !== -1 && targetIndex !== -1) {
+                // Rút phần tử đang kéo ra khỏi mảng
+                let [draggedItem] = weekData.splice(draggedIndex, 1);
+                // Chèn vào vị trí đích
+                weekData.splice(targetIndex, 0, draggedItem);
+                
+                // Cập nhật lại mảng tổng allData
+                allData = allData.filter(item => item.weekKey !== weekKey).concat(weekData);
+                saveData(true);
+            }
+        }
+        return false;
+    }
+
+    function handleDragEnd(e) {
+        this.classList.remove('dragging');
+        let rows = document.querySelectorAll('#contentTable tbody tr');
+        rows.forEach(row => row.classList.remove('over'));
+    }
+    /* ================================== */
+
+    function updateRow(id, field, value) {
+        let item = allData.find(x => x.id === id);
+        if(item) { item[field] = value; saveData(false); }
+    }
+
+    function updateType(id, val) {
+        const types = {
+            chuachon: "Chưa chọn", tuyensinh: "Tuyển Sinh", video: "Video", 
+            hoatdong: "Hoạt Động", kienthuc: "Kiến Thức", tuongtac: "Tương Tác"
+        };
+        let item = allData.find(x => x.id === id);
+        if(item) {
+            item.type = val;
+            item.typeText = types[val];
+            saveData(true);
+        }
+    }
+
+    function updateStatus(id, selectElem) {
+        let item = allData.find(x => x.id === id);
+        if(item) {
+            item.status = selectElem.value;
+            saveData(true);
+        }
+    }
+
+    function addRow() {
+        let weekKey = getWeekKey(currentMonday);
+        allData.push({
+            id: Date.now(),
+            weekKey: weekKey,
+            day: "Bài thêm",
+            date: "Ngày...",
+            type: "chuachon",
+            typeText: "Chưa chọn",
+            content: "",
+            subText: "",
+            status: "chuadang"
+        });
+        saveData(true);
+    }
+
+    function deleteRow(id) {
+        if(confirm("Bạn có chắc chắn muốn xóa bài này không?")) {
+            allData = allData.filter(x => x.id !== id);
+            saveData(true);
+        }
+    }
+
+    function saveData(reRender = false) {
+        localStorage.setItem("LichLopHoc_Pro_TheoTuan", JSON.stringify(allData));
+        if(reRender) renderTable();
+    }
+
+    function updateProgress(weekData) {
+        const total = weekData.length;
+        const done = weekData.filter(item => item.status === 'dadang').length;
+        const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+        
+        document.getElementById('progressBar').style.width = percent + '%';
+        document.getElementById('progressText').innerText = `${done}/${total} Hoàn thành`;
+    }
+
+    function exportToExcel() {
+        let weekKey = getWeekKey(currentMonday);
+        let weekData = allData.filter(item => item.weekKey === weekKey);
+
+        let csvContent = "\uFEFF";
+        csvContent += "Thứ,Ngày,Phân Loại,Nội Dung Chi Tiết,Trạng Thái\n";
+        
+        weekData.forEach(row => {
+            let day = `"${row.day}"`;
+            let date = `"${row.date}"`;
+            let type = `"${row.typeText}"`;
+            let content = `"${(row.content || "").replace(/"/g, '""')}"`; 
+            
+            let statusText = "Chưa đăng";
+            if(row.status === "dadang") statusText = "Đã đăng";
+            if(row.status === "danglam") statusText = "Đang làm";
+            let status = `"${statusText}"`;
+
+            csvContent += `${day},${date},${type},${content},${status}\n`;
+        });
+
+        let fileName = `Bao_Cao_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.setAttribute("download", fileName);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    window.onload = init;
+</script>
+</body>
+</html>
