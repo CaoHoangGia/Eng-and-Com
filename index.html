@@ -18,21 +18,28 @@
         .btn-purple { background: rgba(255,255,255,0.2); color: white; }
         .btn-purple:hover { background: rgba(255,255,255,0.3); }
         
-        .week-navigation { display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,0.2); padding: 6px 15px; border-radius: 20px; margin-bottom: 15px; width: fit-content; }
-        .btn-nav { background: none; border: none; color: white; cursor: pointer; font-weight: bold; font-size: 14px; padding: 5px 10px; border-radius: 50px; transition: 0.2s; }
-        .btn-nav:hover { background: rgba(255,255,255,0.2); }
-        #weekTitle { margin: 0 15px; font-weight: bold; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        /* Chỉnh style cho Tabs môn học */
+        .subject-tabs { display: flex; gap: 15px; padding: 20px 30px 0; background: #fff; }
+        .tab-btn { padding: 12px 24px; border: none; border-radius: 30px; font-weight: bold; font-size: 15px; cursor: pointer; background: #f0f4ff; color: #666; transition: all 0.3s ease; display: flex; align-items: center; gap: 8px;}
+        .tab-btn:hover { background: #e0e7ff; color: #7c4dff; }
+        .tab-btn.active-tab { background: #7c4dff; color: white; box-shadow: 0 4px 15px rgba(124, 77, 255, 0.3); pointer-events: none;}
 
-        .progress-section { margin-top: 25px; display: flex; align-items: center; gap: 15px; }
-        .progress-bar-bg { flex: 1; height: 12px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; }
+        .toolbar { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
+        
+        .week-navigation { display: flex; align-items: center; justify-content: space-between; background: #f0f4ff; padding: 8px 20px; border-radius: 30px; width: fit-content; }
+        .btn-nav { background: none; border: none; color: #7c4dff; cursor: pointer; font-weight: bold; font-size: 14px; padding: 5px 10px; border-radius: 50px; transition: 0.2s; }
+        .btn-nav:hover { background: #e0e7ff; }
+        #weekTitle { margin: 0 15px; font-weight: bold; font-size: 14px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        .progress-section { display: flex; align-items: center; gap: 15px; flex: 1; max-width: 400px; margin-left: 30px;}
+        .progress-bar-bg { flex: 1; height: 12px; background: #f0f0f0; border-radius: 10px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: #00e676; width: 0%; transition: width 0.4s ease; }
-        .progress-text { font-size: 14px; font-weight: bold; min-width: 120px; text-align: right; }
+        .progress-text { font-size: 14px; font-weight: bold; color: #555; }
 
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 18px 20px; font-size: 13px; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
         td { padding: 20px; border-bottom: 1px solid #eee; vertical-align: top; }
         
-        /* Hiệu ứng kéo thả */
         tr { transition: background-color 0.2s; background-color: #fff; }
         tr:hover { background-color: #fafbff; }
         .drag-handle { cursor: grab; font-size: 20px; color: #bbb; display: inline-block; margin-right: 15px; vertical-align: middle; transition: 0.2s; }
@@ -58,37 +65,11 @@
         .type-select { padding: 5px; border-radius: 5px; border: 1px solid #ddd; outline: none; font-size: 12px; font-family: inherit; color: #555; cursor: pointer; }
 
         .col-content { width: 35%; }
+        .content-editable { width: 100%; font-size: 15px; color: #333; outline: none; background: transparent; font-family: inherit; margin-bottom: 5px; min-height: 24px; max-height: 24px; overflow: hidden; transition: max-height 0.3s ease; display: block; border-bottom: 1px dashed transparent; word-wrap: break-word; }
+        .content-editable:focus { border-bottom: 1px dashed #7c4dff; }
+        .content-editable:empty:before { content: attr(data-placeholder); color: #999; pointer-events: none; display: block; }
         
-        /* Cập nhật phần Nội dung để dùng textarea thay vì input */
-        .content-input { 
-            width: 100%; 
-            border: none; 
-            font-size: 15px; 
-            color: #333; 
-            outline: none; 
-            background: transparent; 
-            font-family: inherit; 
-            margin-bottom: 5px;
-            resize: none; /* Tắt kéo dãn mặc định */
-            height: 24px; /* Chiều cao hiển thị 1 dòng */
-            line-height: 24px;
-            overflow: hidden; /* Giấu nội dung tràn */
-            transition: height 0.3s ease;
-            display: block;
-        }
-        .content-input:focus { border-bottom: 1px dashed #7c4dff; }
-        
-        /* Style cho nút Xem thêm */
-        .btn-readmore {
-            background: none; 
-            border: none; 
-            color: #7c4dff; 
-            cursor: pointer; 
-            font-size: 12px; 
-            font-weight: 600; 
-            padding: 0; 
-            display: inline-block;
-        }
+        .btn-readmore { background: none; border: none; color: #7c4dff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 0; display: inline-block; margin-top: 5px; }
         .btn-readmore:hover { text-decoration: underline; }
 
         .col-status { width: 15%; }
@@ -113,18 +94,24 @@
             <button class="btn btn-white" onclick="exportToExcel()">📄 Xuất File Excel</button>
             <button class="btn btn-purple" onclick="addRow()">+ Thêm bài</button>
         </div>
-        
+        <h1>📅 Kế Hoạch Nội Dung Đa Môn</h1>
+        <p>Quản lý nội dung fanpage dễ dàng, phân chia theo từng môn học.</p>
+    </div>
+
+    <div class="subject-tabs">
+        <button class="tab-btn active-tab" id="tab-tin" onclick="switchSubject('tin')">💻 Lịch Tin Học</button>
+        <button class="tab-btn" id="tab-english" onclick="switchSubject('english')">🇬🇧 Lịch Tiếng Anh</button>
+    </div>
+
+    <div class="toolbar">
         <div class="week-navigation">
             <button class="btn-nav" onclick="changeWeek(-1)">◀ Tuần trước</button>
             <span id="weekTitle">Đang tải tuần...</span>
             <button class="btn-nav" onclick="changeWeek(1)">Tuần sau ▶</button>
         </div>
-
-        <h1>📅 Kế Hoạch Nội Dung Lớp Học</h1>
-        <p>Quản lý nội dung fanpage dễ dàng, tự động chia theo từng tuần.</p>
         
         <div class="progress-section">
-            <span class="progress-text" style="text-align: left; min-width: auto;">Tiến độ tuần này:</span>
+            <span class="progress-text">Tiến độ:</span>
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressBar"></div>
             </div>
@@ -148,13 +135,21 @@
     
     <div class="footer-hint">
         <span>💡</span>
-        <span><b>Mẹo:</b> Nắm vào biểu tượng <b>⋮⋮</b> ở đầu mỗi dòng và kéo lên/xuống để sắp xếp lại thứ tự ngày tháng nhé!</span>
+        <span><b>Mẹo:</b> 1. Kéo thả <b>⋮⋮</b> để sắp xếp. 2. Nhấn <b>Ctrl + V</b> để dán ảnh. 3. Dữ liệu Tin học và Tiếng Anh được lưu hoàn toàn riêng biệt.</span>
     </div>
 </div>
 
 <script>
+    // Khai báo biến
     let allData = []; 
     let currentMonday = new Date(); 
+    let currentSubject = 'tin'; // Mặc định mở tab Tin học
+
+    // Các key lưu trữ riêng biệt cho từng môn
+    const STORAGE_KEYS = {
+        tin: "LichLopHoc_Pro_Tin",
+        english: "LichLopHoc_Pro_English"
+    };
 
     function formatDateStr(dateObj) {
         let d = dateObj.getDate().toString().padStart(2, '0');
@@ -163,8 +158,33 @@
         return `${d}/${m}/${y}`;
     }
 
-    function getWeekKey(mondayObj) {
-        return formatDateStr(mondayObj);
+    function getWeekKey(mondayObj) { return formatDateStr(mondayObj); }
+
+    // Chuyển đổi môn học
+    function switchSubject(subj) {
+        currentSubject = subj;
+        
+        // Đổi màu Tab đang được chọn
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active-tab'));
+        document.getElementById(`tab-${subj}`).classList.add('active-tab');
+        
+        // Load lại dữ liệu của môn đó và hiển thị
+        loadData();
+        renderTable();
+    }
+
+    function loadData() {
+        const saved = localStorage.getItem(STORAGE_KEYS[currentSubject]);
+        if (saved) {
+            allData = JSON.parse(saved);
+        } else {
+            allData = [];
+        }
+    }
+
+    function saveData(reRender = false) {
+        localStorage.setItem(STORAGE_KEYS[currentSubject], JSON.stringify(allData));
+        if(reRender) renderTable();
     }
 
     function init() {
@@ -174,10 +194,7 @@
         currentMonday = new Date(today.setDate(diff));
         currentMonday.setHours(0,0,0,0);
 
-        const saved = localStorage.getItem("LichLopHoc_Pro_TheoTuan");
-        if (saved) {
-            allData = JSON.parse(saved);
-        }
+        loadData(); // Tải dữ liệu môn mặc định (Tin)
         renderTable();
     }
 
@@ -189,7 +206,7 @@
     function renderTable() {
         let sunday = new Date(currentMonday);
         sunday.setDate(currentMonday.getDate() + 6);
-        document.getElementById('weekTitle').innerText = `Tuần: Từ ${formatDateStr(currentMonday)} đến ${formatDateStr(sunday)}`;
+        document.getElementById('weekTitle').innerText = `Từ ${formatDateStr(currentMonday)} - ${formatDateStr(sunday)}`;
 
         let weekKey = getWeekKey(currentMonday);
         let weekData = allData.filter(item => item.weekKey === weekKey);
@@ -215,29 +232,19 @@
             const tr = document.createElement("tr");
             tr.setAttribute("draggable", "true");
             
-            // Xử lý sự kiện kéo thả
             tr.ondragstart = function(e) {
                 e.dataTransfer.setData('text/plain', row.id);
                 setTimeout(() => tr.classList.add('dragging'), 10);
             };
-            tr.ondragover = function(e) {
-                e.preventDefault();
-                tr.classList.add('drag-over');
-            };
-            tr.ondragleave = function(e) {
-                tr.classList.remove('drag-over');
-            };
+            tr.ondragover = function(e) { e.preventDefault(); tr.classList.add('drag-over'); };
+            tr.ondragleave = function(e) { tr.classList.remove('drag-over'); };
             tr.ondrop = function(e) {
                 e.preventDefault();
                 tr.classList.remove('drag-over');
                 let draggedId = parseInt(e.dataTransfer.getData('text/plain'));
-                if(draggedId && draggedId !== row.id) {
-                    reorderData(draggedId, row.id);
-                }
+                if(draggedId && draggedId !== row.id) reorderData(draggedId, row.id);
             };
-            tr.ondragend = function() {
-                tr.classList.remove('dragging');
-            };
+            tr.ondragend = function() { tr.classList.remove('dragging'); };
 
             let selectClass = "status-chuadang";
             if(row.status === "dadang") selectClass = "status-dadang";
@@ -263,9 +270,11 @@
                     <div><span class="badge badge-${row.type}">${row.typeText}</span></div>
                 </td>
                 <td class="col-content">
-                    <textarea id="content-${row.id}" class="content-input" 
-                        oninput="updateRow(${row.id}, 'content', this.value); autoResize(this)" 
-                        placeholder="Ghi nội dung bài đăng vào đây...">${row.content}</textarea>
+                    <div id="content-${row.id}" class="content-editable" 
+                        contenteditable="true" 
+                        data-placeholder="Ghi nội dung, dán ảnh (Ctrl+V) vào đây..."
+                        oninput="updateRowContent(${row.id}, this.innerHTML); autoResizeDiv(this)"
+                        onpaste="handlePaste(event, ${row.id})">${row.content}</div>
                     <button class="btn-readmore" id="btn-readmore-${row.id}" onclick="toggleReadMore(${row.id})">Xem thêm ▼</button>
                 </td>
                 <td class="col-status">
@@ -285,39 +294,67 @@
         updateProgress(weekData);
     }
 
-    // Các hàm xử lý sự kiện hiển thị
+    function handlePaste(e, id) {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (let index in items) {
+            const item = items[index];
+            if (item.kind === 'file' && item.type.includes('image')) {
+                e.preventDefault(); 
+                const blob = item.getAsFile();
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const MAX_WIDTH = 300; 
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+                        canvas.width = width; canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                        
+                        const imgHTML = `<br><img src="${dataUrl}" style="max-width: 100%; border-radius: 8px; margin-top: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);"/><br>`;
+                        document.execCommand('insertHTML', false, imgHTML);
+                        
+                        let div = document.getElementById(`content-${id}`);
+                        updateRowContent(id, div.innerHTML);
+                        autoResizeDiv(div);
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(blob);
+            }
+        }
+    }
+
     function toggleReadMore(id) {
-        let textarea = document.getElementById(`content-${id}`);
+        let div = document.getElementById(`content-${id}`);
         let btn = document.getElementById(`btn-readmore-${id}`);
-        
-        if (textarea.classList.contains("expanded")) {
-            textarea.classList.remove("expanded");
-            textarea.style.height = "24px"; // Thu nhỏ về 1 dòng
-            btn.innerHTML = "Xem thêm ▼";
+        if (div.classList.contains("expanded")) {
+            div.classList.remove("expanded"); div.style.maxHeight = "24px"; btn.innerHTML = "Xem thêm ▼";
         } else {
-            textarea.classList.add("expanded");
-            // Mở rộng ra bằng đúng chiều cao nội dung bên trong
-            textarea.style.height = textarea.scrollHeight + "px"; 
-            btn.innerHTML = "Thu gọn ▲";
+            div.classList.add("expanded"); div.style.maxHeight = div.scrollHeight + 100 + "px"; btn.innerHTML = "Thu gọn ▲";
         }
     }
 
-    function autoResize(textarea) {
-        // Tự động kéo dãn khi người dùng đang nhập lúc đang mở "Xem thêm"
-        if (textarea.classList.contains("expanded")) {
-            textarea.style.height = "auto";
-            textarea.style.height = textarea.scrollHeight + "px";
+    function autoResizeDiv(div) {
+        if (div.classList.contains("expanded")) {
+            div.style.maxHeight = "none"; div.style.maxHeight = div.scrollHeight + 50 + "px";
         }
     }
 
-    // Hàm đổi vị trí 2 dòng trong mảng
+    function updateRowContent(id, htmlValue) {
+        let item = allData.find(x => x.id === id);
+        if(item) { item.content = htmlValue; saveData(false); }
+    }
+
     function reorderData(draggedId, targetId) {
         let draggedIndex = allData.findIndex(x => x.id === draggedId);
         let draggedItem = allData.splice(draggedIndex, 1)[0]; 
-        
         let targetIndex = allData.findIndex(x => x.id === targetId);
         allData.splice(targetIndex, 0, draggedItem); 
-        
         saveData(true); 
     }
 
@@ -356,11 +393,6 @@
         }
     }
 
-    function saveData(reRender = false) {
-        localStorage.setItem("LichLopHoc_Pro_TheoTuan", JSON.stringify(allData));
-        if(reRender) renderTable();
-    }
-
     function updateProgress(weekData) {
         const total = weekData.length;
         const done = weekData.filter(item => item.status === 'dadang').length;
@@ -378,7 +410,11 @@
             let day = `"${row.day}"`;
             let date = `"${row.date}"`;
             let type = `"${row.typeText}"`;
-            let content = `"${(row.content || "").replace(/"/g, '""')}"`; 
+            
+            let rawContent = row.content || "";
+            let textContent = rawContent.replace(/<img[^>]*>/g, "\n[Có đính kèm Hình ảnh]\n").replace(/<br\s*[\/]?>/gi, "\n").replace(/<[^>]+>/g, '').trim();
+            let content = `"${textContent.replace(/"/g, '""')}"`; 
+            
             let statusText = row.status === "dadang" ? "Đã đăng" : (row.status === "danglam" ? "Đang làm" : "Chưa đăng");
             csvContent += `${day},${date},${type},${content},"${statusText}"\n`;
         });
@@ -386,7 +422,8 @@
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = `Bao_Cao_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
+        let subjectName = currentSubject === 'tin' ? 'TinHoc' : 'TiengAnh';
+        link.download = `Bao_Cao_${subjectName}_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
