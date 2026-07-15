@@ -31,18 +31,17 @@
         table { width: 100%; border-collapse: collapse; }
         th { text-align: left; padding: 18px 20px; font-size: 13px; color: #888; border-bottom: 1px solid #eee; text-transform: uppercase; }
         td { padding: 20px; border-bottom: 1px solid #eee; vertical-align: top; }
-        tr:hover { background-color: #fafbff; }
         
-        /* CSS CHO KÉO THẢ */
-        .draggable-row { cursor: grab; background: #fff; transition: background 0.2s;}
-        .draggable-row:active { cursor: grabbing; }
-        .draggable-row.dragging { opacity: 0.5; background: #f0f4ff; }
-        .draggable-row.over { border-top: 3px dashed #7c4dff; }
-        .drag-handle { color: #ccc; font-size: 20px; cursor: inherit; margin-right: 15px; display: flex; align-items: center; }
+        /* Hiệu ứng kéo thả */
+        tr { transition: background-color 0.2s; background-color: #fff; }
+        tr:hover { background-color: #fafbff; }
+        .drag-handle { cursor: grab; font-size: 20px; color: #bbb; display: inline-block; margin-right: 15px; vertical-align: middle; transition: 0.2s; }
         .drag-handle:hover { color: #7c4dff; }
-        .date-wrapper { display: flex; align-items: flex-start; }
-
-        .col-date { width: 15%; }
+        .dragging { opacity: 0.4; background-color: #f0f0f0; }
+        .drag-over { border-top: 3px dashed #7c4dff !important; }
+        
+        .col-date { width: 20%; display: flex; align-items: center; border-bottom: none; padding-bottom: 0;}
+        .col-date-inputs { flex: 1; }
         .col-date input { font-family: inherit; width: 100%; border: none; outline: none; background: transparent; }
         .date-day { font-weight: bold; font-size: 16px; color: #333; margin-bottom: 3px; }
         .date-num { color: #888; font-size: 13px; }
@@ -58,9 +57,39 @@
 
         .type-select { padding: 5px; border-radius: 5px; border: 1px solid #ddd; outline: none; font-size: 12px; font-family: inherit; color: #555; cursor: pointer; }
 
-        .col-content { width: 40%; }
-        .col-content input { width: 100%; border: none; font-size: 15px; color: #333; outline: none; background: transparent; font-family: inherit; margin-bottom: 5px; }
-        .col-content input:focus { border-bottom: 1px dashed #7c4dff; }
+        .col-content { width: 35%; }
+        
+        /* Cập nhật phần Nội dung để dùng textarea thay vì input */
+        .content-input { 
+            width: 100%; 
+            border: none; 
+            font-size: 15px; 
+            color: #333; 
+            outline: none; 
+            background: transparent; 
+            font-family: inherit; 
+            margin-bottom: 5px;
+            resize: none; /* Tắt kéo dãn mặc định */
+            height: 24px; /* Chiều cao hiển thị 1 dòng */
+            line-height: 24px;
+            overflow: hidden; /* Giấu nội dung tràn */
+            transition: height 0.3s ease;
+            display: block;
+        }
+        .content-input:focus { border-bottom: 1px dashed #7c4dff; }
+        
+        /* Style cho nút Xem thêm */
+        .btn-readmore {
+            background: none; 
+            border: none; 
+            color: #7c4dff; 
+            cursor: pointer; 
+            font-size: 12px; 
+            font-weight: 600; 
+            padding: 0; 
+            display: inline-block;
+        }
+        .btn-readmore:hover { text-decoration: underline; }
 
         .col-status { width: 15%; }
         .status-select { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-weight: bold; font-family: inherit; appearance: none; cursor: pointer; }
@@ -78,7 +107,6 @@
     </style>
 </head>
 <body>
-
 <div class="app-container">
     <div class="header">
         <div class="header-buttons">
@@ -93,7 +121,7 @@
         </div>
 
         <h1>📅 Kế Hoạch Nội Dung Lớp Học</h1>
-        <p>Quản lý nội dung fanpage dễ dàng. Có thể KÉO THẢ các hàng để sắp xếp vị trí.</p>
+        <p>Quản lý nội dung fanpage dễ dàng, tự động chia theo từng tuần.</p>
         
         <div class="progress-section">
             <span class="progress-text" style="text-align: left; min-width: auto;">Tiến độ tuần này:</span>
@@ -120,14 +148,13 @@
     
     <div class="footer-hint">
         <span>💡</span>
-        <span><b>Mẹo:</b> Mỗi tuần có 7 ngày. Giữ và kéo thả biểu tượng ☰ để thay đổi thứ tự các bài đăng trong tuần.</span>
+        <span><b>Mẹo:</b> Nắm vào biểu tượng <b>⋮⋮</b> ở đầu mỗi dòng và kéo lên/xuống để sắp xếp lại thứ tự ngày tháng nhé!</span>
     </div>
 </div>
 
 <script>
-    let allData = [];
-    let currentMonday = new Date();
-    let draggedRowId = null; // Lưu ID của hàng đang được kéo
+    let allData = []; 
+    let currentMonday = new Date(); 
 
     function formatDateStr(dateObj) {
         let d = dateObj.getDate().toString().padStart(2, '0');
@@ -143,7 +170,7 @@
     function init() {
         let today = new Date();
         let day = today.getDay();
-        let diff = today.getDate() - day + (day === 0 ? -6 : 1);
+        let diff = today.getDate() - day + (day === 0 ? -6 : 1); 
         currentMonday = new Date(today.setDate(diff));
         currentMonday.setHours(0,0,0,0);
 
@@ -151,7 +178,6 @@
         if (saved) {
             allData = JSON.parse(saved);
         }
-        
         renderTable();
     }
 
@@ -173,21 +199,12 @@
             for (let i = 0; i < 7; i++) {
                 let tempDate = new Date(currentMonday);
                 tempDate.setDate(currentMonday.getDate() + i);
-                
-                let newItem = {
-                    id: Date.now() + i,
-                    weekKey: weekKey,
-                    day: dayNames[i],
-                    date: formatDateStr(tempDate),
-                    type: "chuachon",
-                    typeText: "Chưa chọn",
-                    content: "",
-                    subText: "",
-                    status: "chuadang"
-                };
-                allData.push(newItem);
+                allData.push({
+                    id: Date.now() + i, weekKey: weekKey, day: dayNames[i], date: formatDateStr(tempDate),
+                    type: "chuachon", typeText: "Chưa chọn", content: "", status: "chuadang"
+                });
             }
-            saveData(false);
+            saveData(false); 
             weekData = allData.filter(item => item.weekKey === weekKey);
         }
 
@@ -196,30 +213,42 @@
 
         weekData.forEach((row) => {
             const tr = document.createElement("tr");
-            tr.className = "draggable-row"; // Thêm class kéo thả
-            tr.setAttribute("draggable", "true"); // Kích hoạt kéo thả
-            tr.dataset.id = row.id; // Gắn ID để nhận diện khi đổi chỗ
-
-            // Các Event Listener cho tính năng Drag & Drop
-            tr.addEventListener('dragstart', handleDragStart);
-            tr.addEventListener('dragover', handleDragOver);
-            tr.addEventListener('dragenter', handleDragEnter);
-            tr.addEventListener('dragleave', handleDragLeave);
-            tr.addEventListener('drop', handleDrop);
-            tr.addEventListener('dragend', handleDragEnd);
+            tr.setAttribute("draggable", "true");
+            
+            // Xử lý sự kiện kéo thả
+            tr.ondragstart = function(e) {
+                e.dataTransfer.setData('text/plain', row.id);
+                setTimeout(() => tr.classList.add('dragging'), 10);
+            };
+            tr.ondragover = function(e) {
+                e.preventDefault();
+                tr.classList.add('drag-over');
+            };
+            tr.ondragleave = function(e) {
+                tr.classList.remove('drag-over');
+            };
+            tr.ondrop = function(e) {
+                e.preventDefault();
+                tr.classList.remove('drag-over');
+                let draggedId = parseInt(e.dataTransfer.getData('text/plain'));
+                if(draggedId && draggedId !== row.id) {
+                    reorderData(draggedId, row.id);
+                }
+            };
+            tr.ondragend = function() {
+                tr.classList.remove('dragging');
+            };
 
             let selectClass = "status-chuadang";
             if(row.status === "dadang") selectClass = "status-dadang";
             if(row.status === "danglam") selectClass = "status-danglam";
 
             tr.innerHTML = `
-                <td class="col-date">
-                    <div class="date-wrapper">
-                        <span class="drag-handle" title="Kéo để di chuyển">☰</span>
-                        <div>
-                            <input type="text" class="date-day" value="${row.day}" oninput="updateRow(${row.id}, 'day', this.value)">
-                            <input type="text" class="date-num" value="${row.date}" oninput="updateRow(${row.id}, 'date', this.value)">
-                        </div>
+                <td style="display: flex; align-items: center; border-bottom: none;">
+                    <span class="drag-handle" title="Nắm để kéo thả">⋮⋮</span>
+                    <div class="col-date-inputs">
+                        <input type="text" class="date-day" value="${row.day}" oninput="updateRow(${row.id}, 'day', this.value)">
+                        <input type="text" class="date-num" value="${row.date}" oninput="updateRow(${row.id}, 'date', this.value)">
                     </div>
                 </td>
                 <td class="col-type">
@@ -234,7 +263,10 @@
                     <div><span class="badge badge-${row.type}">${row.typeText}</span></div>
                 </td>
                 <td class="col-content">
-                    <input type="text" value="${row.content}" oninput="updateRow(${row.id}, 'content', this.value)" placeholder="Ghi nội dung bài đăng vào đây...">
+                    <textarea id="content-${row.id}" class="content-input" 
+                        oninput="updateRow(${row.id}, 'content', this.value); autoResize(this)" 
+                        placeholder="Ghi nội dung bài đăng vào đây...">${row.content}</textarea>
+                    <button class="btn-readmore" id="btn-readmore-${row.id}" onclick="toggleReadMore(${row.id})">Xem thêm ▼</button>
                 </td>
                 <td class="col-status">
                     <select class="status-select ${selectClass}" onchange="updateStatus(${row.id}, this)">
@@ -253,64 +285,41 @@
         updateProgress(weekData);
     }
 
-    /* ==== CÁC HÀM XỬ LÝ KÉO THẢ ==== */
-    function handleDragStart(e) {
-        draggedRowId = parseInt(this.dataset.id);
-        this.classList.add('dragging');
-        e.dataTransfer.effectAllowed = 'move';
-    }
-
-    function handleDragOver(e) {
-        if (e.preventDefault) {
-            e.preventDefault(); // Cần thiết để cho phép Drop
-        }
-        e.dataTransfer.dropEffect = 'move';
-        return false;
-    }
-
-    function handleDragEnter(e) {
-        this.classList.add('over');
-    }
-
-    function handleDragLeave(e) {
-        this.classList.remove('over');
-    }
-
-    function handleDrop(e) {
-        if (e.stopPropagation) {
-            e.stopPropagation();
-        }
+    // Các hàm xử lý sự kiện hiển thị
+    function toggleReadMore(id) {
+        let textarea = document.getElementById(`content-${id}`);
+        let btn = document.getElementById(`btn-readmore-${id}`);
         
-        let targetRowId = parseInt(this.dataset.id);
-        
-        if (draggedRowId !== targetRowId) {
-            let weekKey = getWeekKey(currentMonday);
-            // Lấy riêng mảng dữ liệu của tuần hiện tại để đổi chỗ
-            let weekData = allData.filter(item => item.weekKey === weekKey);
-            
-            let draggedIndex = weekData.findIndex(x => x.id === draggedRowId);
-            let targetIndex = weekData.findIndex(x => x.id === targetRowId);
-            
-            if(draggedIndex !== -1 && targetIndex !== -1) {
-                // Rút phần tử đang kéo ra khỏi mảng
-                let [draggedItem] = weekData.splice(draggedIndex, 1);
-                // Chèn vào vị trí đích
-                weekData.splice(targetIndex, 0, draggedItem);
-                
-                // Cập nhật lại mảng tổng allData
-                allData = allData.filter(item => item.weekKey !== weekKey).concat(weekData);
-                saveData(true);
-            }
+        if (textarea.classList.contains("expanded")) {
+            textarea.classList.remove("expanded");
+            textarea.style.height = "24px"; // Thu nhỏ về 1 dòng
+            btn.innerHTML = "Xem thêm ▼";
+        } else {
+            textarea.classList.add("expanded");
+            // Mở rộng ra bằng đúng chiều cao nội dung bên trong
+            textarea.style.height = textarea.scrollHeight + "px"; 
+            btn.innerHTML = "Thu gọn ▲";
         }
-        return false;
     }
 
-    function handleDragEnd(e) {
-        this.classList.remove('dragging');
-        let rows = document.querySelectorAll('#contentTable tbody tr');
-        rows.forEach(row => row.classList.remove('over'));
+    function autoResize(textarea) {
+        // Tự động kéo dãn khi người dùng đang nhập lúc đang mở "Xem thêm"
+        if (textarea.classList.contains("expanded")) {
+            textarea.style.height = "auto";
+            textarea.style.height = textarea.scrollHeight + "px";
+        }
     }
-    /* ================================== */
+
+    // Hàm đổi vị trí 2 dòng trong mảng
+    function reorderData(draggedId, targetId) {
+        let draggedIndex = allData.findIndex(x => x.id === draggedId);
+        let draggedItem = allData.splice(draggedIndex, 1)[0]; 
+        
+        let targetIndex = allData.findIndex(x => x.id === targetId);
+        allData.splice(targetIndex, 0, draggedItem); 
+        
+        saveData(true); 
+    }
 
     function updateRow(id, field, value) {
         let item = allData.find(x => x.id === id);
@@ -323,33 +332,19 @@
             hoatdong: "Hoạt Động", kienthuc: "Kiến Thức", tuongtac: "Tương Tác"
         };
         let item = allData.find(x => x.id === id);
-        if(item) {
-            item.type = val;
-            item.typeText = types[val];
-            saveData(true);
-        }
+        if(item) { item.type = val; item.typeText = types[val]; saveData(true); }
     }
 
     function updateStatus(id, selectElem) {
         let item = allData.find(x => x.id === id);
-        if(item) {
-            item.status = selectElem.value;
-            saveData(true);
-        }
+        if(item) { item.status = selectElem.value; saveData(true); }
     }
 
     function addRow() {
         let weekKey = getWeekKey(currentMonday);
         allData.push({
-            id: Date.now(),
-            weekKey: weekKey,
-            day: "Bài thêm",
-            date: "Ngày...",
-            type: "chuachon",
-            typeText: "Chưa chọn",
-            content: "",
-            subText: "",
-            status: "chuadang"
+            id: Date.now(), weekKey: weekKey, day: "Bài thêm", date: "Ngày...",
+            type: "chuachon", typeText: "Chưa chọn", content: "", status: "chuadang"
         });
         saveData(true);
     }
@@ -370,7 +365,6 @@
         const total = weekData.length;
         const done = weekData.filter(item => item.status === 'dadang').length;
         const percent = total === 0 ? 0 : Math.round((done / total) * 100);
-        
         document.getElementById('progressBar').style.width = percent + '%';
         document.getElementById('progressText').innerText = `${done}/${total} Hoàn thành`;
     }
@@ -378,35 +372,22 @@
     function exportToExcel() {
         let weekKey = getWeekKey(currentMonday);
         let weekData = allData.filter(item => item.weekKey === weekKey);
-
-        let csvContent = "\uFEFF";
-        csvContent += "Thứ,Ngày,Phân Loại,Nội Dung Chi Tiết,Trạng Thái\n";
+        let csvContent = "\uFEFFThứ,Ngày,Phân Loại,Nội Dung Chi Tiết,Trạng Thái\n";
         
         weekData.forEach(row => {
             let day = `"${row.day}"`;
             let date = `"${row.date}"`;
             let type = `"${row.typeText}"`;
             let content = `"${(row.content || "").replace(/"/g, '""')}"`; 
-            
-            let statusText = "Chưa đăng";
-            if(row.status === "dadang") statusText = "Đã đăng";
-            if(row.status === "danglam") statusText = "Đang làm";
-            let status = `"${statusText}"`;
-
-            csvContent += `${day},${date},${type},${content},${status}\n`;
+            let statusText = row.status === "dadang" ? "Đã đăng" : (row.status === "danglam" ? "Đang làm" : "Chưa đăng");
+            csvContent += `${day},${date},${type},${content},"${statusText}"\n`;
         });
-
-        let fileName = `Bao_Cao_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", fileName);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        link.href = URL.createObjectURL(blob);
+        link.download = `Bao_Cao_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
     }
 
     window.onload = init;
