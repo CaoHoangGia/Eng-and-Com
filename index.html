@@ -294,12 +294,18 @@
         updateProgress(weekData);
     }
 
+    // ĐÃ SỬA: Chặn copy màu nền, chỉ lấy chữ thuần túy
     function handlePaste(e, id) {
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (let index in items) {
+        e.preventDefault(); 
+        
+        const clipboardData = e.clipboardData || window.clipboardData;
+        const items = clipboardData.items;
+        let isImage = false;
+
+        for (let index = 0; index < items.length; index++) {
             const item = items[index];
             if (item.kind === 'file' && item.type.includes('image')) {
-                e.preventDefault(); 
+                isImage = true;
                 const blob = item.getAsFile();
                 const reader = new FileReader();
                 reader.onload = function(event) {
@@ -325,7 +331,16 @@
                     img.src = event.target.result;
                 };
                 reader.readAsDataURL(blob);
+                return; 
             }
+        }
+
+        if (!isImage) {
+            const text = clipboardData.getData('text/plain');
+            document.execCommand('insertText', false, text);
+            let div = document.getElementById(`content-${id}`);
+            updateRowContent(id, div.innerHTML);
+            autoResizeDiv(div);
         }
     }
 
@@ -401,30 +416,65 @@
         document.getElementById('progressText').innerText = `${done}/${total} Hoàn thành`;
     }
 
+    // ĐÃ SỬA: Xuất file HTML định dạng Excel để không bao giờ bị cắt chữ
     function exportToExcel() {
         let weekKey = getWeekKey(currentMonday);
         let weekData = allData.filter(item => item.weekKey === weekKey);
-        let csvContent = "\uFEFFThứ,Ngày,Phân Loại,Nội Dung Chi Tiết,Trạng Thái\n";
+        
+        let tableHTML = `
+            <html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">
+            <head>
+                <meta charset="utf-8" />
+                <style>
+                    table { border-collapse: collapse; width: 100%; font-family: sans-serif; }
+                    th, td { border: 1px solid #dddddd; padding: 10px; text-align: left; vertical-align: top; }
+                    th { background-color: #f2f2f2; font-weight: bold; }
+                </style>
+            </head>
+            <body>
+                <table>
+                    <tr>
+                        <th>Thứ</th>
+                        <th>Ngày</th>
+                        <th>Phân Loại</th>
+                        <th>Nội Dung Chi Tiết</th>
+                        <th>Trạng Thái</th>
+                    </tr>`;
         
         weekData.forEach(row => {
-            let day = `"${row.day}"`;
-            let date = `"${row.date}"`;
-            let type = `"${row.typeText}"`;
-            
             let rawContent = row.content || "";
-            let textContent = rawContent.replace(/<img[^>]*>/g, "\n[Có đính kèm Hình ảnh]\n").replace(/<br\s*[\/]?>/gi, "\n").replace(/<[^>]+>/g, '').trim();
-            let content = `"${textContent.replace(/"/g, '""')}"`; 
+            let textContent = rawContent
+                .replace(/<img[^>]*>/gi, "\n[Có đính kèm Hình ảnh]\n")
+                .replace(/<br\s*[\/]?>/gi, "\n")
+                .replace(/<\/div>|<\/p>/gi, "\n")
+                .replace(/<[^>]+>/g, '') 
+                .replace(/&nbsp;/g, ' ')
+                .trim();
             
+            let excelContent = textContent.replace(/\n/g, '<br style="mso-data-placement:same-cell;" />');
+
             let statusText = row.status === "dadang" ? "Đã đăng" : (row.status === "danglam" ? "Đang làm" : "Chưa đăng");
-            csvContent += `${day},${date},${type},${content},"${statusText}"\n`;
+            
+            tableHTML += `
+                <tr>
+                    <td>${row.day}</td>
+                    <td>${row.date}</td>
+                    <td>${row.typeText}</td>
+                    <td>${excelContent}</td>
+                    <td>${statusText}</td>
+                </tr>`;
         });
 
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
+        tableHTML += `</table></body></html>`;
+        
+        let blob = new Blob([tableHTML], { type: 'application/vnd.ms-excel' });
+        let link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
         let subjectName = currentSubject === 'tin' ? 'TinHoc' : 'TiengAnh';
-        link.download = `Bao_Cao_${subjectName}_Tuan_${weekKey.replace(/\//g, '_')}.csv`;
-        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        link.download = `Bao_Cao_${subjectName}_Tuan_${weekKey.replace(/\//g, '_')}.xls`;
+        document.body.appendChild(link); 
+        link.click(); 
+        document.body.removeChild(link);
     }
 
     window.onload = init;
